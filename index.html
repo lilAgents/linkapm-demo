@@ -257,6 +257,22 @@
   .meta-grid { display: grid; grid-template-columns: 140px 1fr; gap: 10px 20px; font-size: 13px; }
   .meta-grid dt { color: var(--muted); font-weight: 500; }
   .meta-grid dd { color: var(--ink); }
+
+  /* ===== Mobile (<640px) refinements ===== */
+  @media (max-width: 640px) {
+    .stat-card { padding: 10px 12px; }
+    .stat-value { font-size: 17px; }
+    .email-body { padding: 16px; font-size: 13.5px; line-height: 1.6; }
+    .email-head { padding: 12px 14px; font-size: 12px; }
+    .email-head .grid { grid-template-columns: 50px 1fr !important; }
+    .meta-grid { grid-template-columns: 110px 1fr; gap: 8px 12px; font-size: 12.5px; }
+    .avatar-mh { width: 44px; height: 44px; font-size: 14px; box-shadow: 0 2px 8px -2px rgba(10,31,61,0.25); }
+    .note-box { padding: 12px 14px; font-size: 13px; line-height: 1.5; }
+    .point-num { width: 20px; height: 20px; font-size: 10px; }
+    .calendar-slot { padding: 8px 4px; }
+    .input { padding: 10px 11px; font-size: 15px; } /* 16px-ish prevents iOS zoom */
+    .tab-btn { letter-spacing: 0 !important; }
+  }
 </style>
 </head>
 <body>
@@ -264,19 +280,23 @@
 <!-- ============================ -->
 <!-- DEMO BAR -->
 <!-- ============================ -->
-<div class="demo-bar sticky top-0 z-50 px-5 py-2.5 flex items-center justify-between text-sm">
-  <div class="flex items-center gap-3">
+<div class="demo-bar sticky top-0 z-50 px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 text-sm">
+  <div class="hidden sm:flex items-center gap-3 flex-shrink-0">
     <div class="pulse"></div>
     <span class="mono text-xs tracking-wider uppercase">Demo</span>
     <span class="text-gray-500 mono text-xs">·</span>
     <span class="text-gray-400 text-xs">LinkAPM Intake System</span>
   </div>
-  <div class="flex items-center gap-0.5 bg-white/5 p-0.5 rounded">
-    <button class="tab-btn active px-4 py-1.5 rounded text-[11px] font-semibold tracking-wide" data-stage="form">01 · INTAKE</button>
-    <button class="tab-btn px-4 py-1.5 rounded text-[11px] font-semibold tracking-wide" data-stage="confirm">02 · RESPONSE</button>
-    <button class="tab-btn px-4 py-1.5 rounded text-[11px] font-semibold tracking-wide" data-stage="brief">03 · BRIEF</button>
+  <div class="flex sm:hidden items-center gap-2 flex-shrink-0">
+    <div class="pulse"></div>
+    <span class="mono text-[10px] tracking-wider uppercase">Demo</span>
   </div>
-  <div class="text-[11px] mono text-gray-500">lilAgents</div>
+  <div class="flex items-center gap-0.5 bg-white/5 p-0.5 rounded">
+    <button class="tab-btn active px-2.5 sm:px-4 py-2 sm:py-1.5 rounded text-[10px] sm:text-[11px] font-semibold tracking-wide" data-stage="form">01 · INTAKE</button>
+    <button class="tab-btn px-2.5 sm:px-4 py-2 sm:py-1.5 rounded text-[10px] sm:text-[11px] font-semibold tracking-wide" data-stage="confirm">02 · RESPONSE</button>
+    <button class="tab-btn px-2.5 sm:px-4 py-2 sm:py-1.5 rounded text-[10px] sm:text-[11px] font-semibold tracking-wide" data-stage="brief">03 · BRIEF</button>
+  </div>
+  <div class="hidden sm:block text-[11px] mono text-gray-500 flex-shrink-0">lilAgents</div>
 </div>
 
 
@@ -306,17 +326,17 @@
     </div>
   </header>
 
-  <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-12 gap-12">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-14 grid md:grid-cols-12 gap-8 md:gap-12">
 
     <!-- Left: pitch -->
     <div class="md:col-span-5">
       <div class="mono text-[10px] tracking-[0.15em] uppercase mb-4" style="color: var(--gold);">
         Request a proposal
       </div>
-      <h1 class="display text-[44px] font-semibold leading-[1.05] mb-5" style="color: var(--navy);">
+      <h1 class="display text-[30px] sm:text-[36px] md:text-[44px] font-semibold leading-[1.05] mb-5" style="color: var(--navy);">
         Built for boards that want <em>more</em> from their manager.
       </h1>
-      <p class="text-base mb-8 leading-relaxed" style="color: var(--ink-2);">
+      <p class="text-base mb-7 sm:mb-8 leading-relaxed" style="color: var(--ink-2);">
         Tell us about your community in 90 seconds. You'll hear back from our director within one business day, no generic sales pitch.
       </p>
 
@@ -355,7 +375,7 @@
 
     <!-- Right: form -->
     <div class="md:col-span-7">
-      <div class="card paper-shadow p-7">
+      <div class="card paper-shadow p-5 sm:p-7">
 
         <!-- Progress -->
         <div class="flex items-center justify-between mb-7">
@@ -607,16 +627,16 @@
     </div>
   </header>
 
-  <div class="max-w-4xl mx-auto px-6 py-14">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-14">
 
     <!-- Confirmation -->
-    <div class="card paper-shadow p-9 mb-7">
-      <div class="flex items-start gap-4 mb-6">
-        <div class="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" style="background: #dcfce7;">
+    <div class="card paper-shadow p-5 sm:p-9 mb-7">
+      <div class="flex items-start gap-3 sm:gap-4 mb-6">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center flex-shrink-0" style="background: #dcfce7;">
           <svg class="w-5 h-5" style="color: var(--success);" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
         </div>
-        <div class="flex-1">
-          <div class="display text-3xl font-semibold mb-1" style="color: var(--navy);">Margaret, we got it.</div>
+        <div class="flex-1 min-w-0">
+          <div class="display text-2xl sm:text-3xl font-semibold mb-1 leading-tight" style="color: var(--navy);">Margaret, we got it.</div>
           <div class="text-sm" style="color: var(--muted);">Inquiry received <span class="mono">14:47 EST</span> · Thu, May 21</div>
         </div>
       </div>
@@ -645,15 +665,15 @@
         </div>
       </div>
 
-      <div class="rounded-md p-5 border" style="border-color: var(--line); background: #fafaf6;">
-        <div class="flex items-center justify-between mb-4">
+      <div class="rounded-md p-4 sm:p-5 border" style="border-color: var(--line); background: #fafaf6;">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
           <div>
             <div class="font-semibold text-sm">Book Jim's calendar directly</div>
             <div class="text-xs" style="color: var(--muted);">All times Eastern. 30-minute discovery call.</div>
           </div>
-          <span class="tag-soft">3 slots open this week</span>
+          <span class="tag-soft self-start sm:self-auto">3 slots open this week</span>
         </div>
-        <div class="grid grid-cols-4 gap-2 mb-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
           <div class="calendar-slot">
             <div class="text-[10px] mono uppercase tracking-wider opacity-60">Tue</div>
             <div class="text-sm font-semibold mt-0.5">May 26</div>
@@ -725,13 +745,14 @@
 <!-- ============================ -->
 <div class="stage" id="stage-brief" style="background: var(--bg-2);">
 
-  <div class="max-w-4xl mx-auto px-6 py-10">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
     <!-- Meta strip -->
-    <div class="flex items-center justify-between mb-4 text-xs">
-      <div class="flex items-center gap-3">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 text-xs">
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <span class="tag-ai">Brief generated</span>
-        <span class="mono" style="color: var(--muted);">→ jim@linkapm.com · 14:51 EST · 4 min after inquiry</span>
+        <span class="mono hidden sm:inline" style="color: var(--muted);">→ jim@linkapm.com · 14:51 EST · 4 min after inquiry</span>
+        <span class="mono sm:hidden text-[11px]" style="color: var(--muted);">→ jim@linkapm.com · 4 min later</span>
       </div>
       <div class="flex items-center gap-3">
         <button class="text-xs font-semibold flex items-center gap-1.5" style="color: var(--navy);">
@@ -745,14 +766,14 @@
     <div class="card paper-shadow overflow-hidden">
 
       <!-- Header -->
-      <div class="px-10 py-8" style="background: var(--navy); color: #fff;">
-        <div class="flex items-start justify-between">
+      <div class="px-5 py-6 sm:px-10 sm:py-8" style="background: var(--navy); color: #fff;">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
           <div>
             <div class="brief-label" style="color: var(--gold-2);">Pre-call brief</div>
-            <div class="display text-[28px] font-semibold leading-tight mt-2">Stoneridge Commons COA</div>
+            <div class="display text-[22px] sm:text-[28px] font-semibold leading-tight mt-2">Stoneridge Commons COA</div>
             <div class="text-sm mt-1.5" style="color: rgba(255,255,255,0.65);">Margaret Hollis · Treasurer · 84 units · Westerville, OH</div>
           </div>
-          <div class="text-right">
+          <div class="text-left sm:text-right sm:flex-shrink-0">
             <div class="brief-label" style="color: var(--gold-2);">Scheduled</div>
             <div class="font-semibold mt-2 text-base">Wed, May 27</div>
             <div class="text-sm mono" style="color: rgba(255,255,255,0.65);">2:30 PM EST</div>
@@ -760,7 +781,7 @@
         </div>
       </div>
 
-      <div class="px-10 py-9">
+      <div class="px-5 py-6 sm:px-10 sm:py-9">
 
         <!-- 1. TL;DR -->
         <section class="mb-9">
@@ -827,7 +848,7 @@
             <div class="brief-label">Who you're calling</div>
             <span class="tag-ai">LinkedIn + Public</span>
           </div>
-          <div class="flex gap-5">
+          <div class="flex flex-col sm:flex-row gap-3 sm:gap-5">
             <div class="avatar-mh">MH</div>
             <div class="text-sm leading-relaxed space-y-2.5 flex-1" style="color: var(--ink-2);">
               <p>
@@ -927,18 +948,18 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-10 py-4 border-t flex items-center justify-between text-[11px] mono" style="border-color: var(--line); background: #fafaf6; color: var(--muted);">
+      <div class="px-5 py-3 sm:px-10 sm:py-4 border-t flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 text-[11px] mono" style="border-color: var(--line); background: #fafaf6; color: var(--muted);">
         <div>LinkAPM Intake System · Built by lilAgents</div>
-        <div>Form · County records · LinkedIn · Google · Zillow · Vantaca</div>
+        <div class="text-[10px] sm:text-[11px]">Form · County records · LinkedIn · Google · Zillow · Vantaca</div>
       </div>
 
     </div>
 
     <!-- Actions -->
-    <div class="mt-5 grid grid-cols-3 gap-2.5">
-      <button class="btn-ghost py-2.5 text-sm">Mark reviewed</button>
-      <button class="btn-ghost py-2.5 text-sm">Send draft proposal</button>
-      <button class="btn-primary py-2.5 text-sm">Open in Vantaca CRM</button>
+    <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      <button class="btn-ghost py-3 sm:py-2.5 text-sm">Mark reviewed</button>
+      <button class="btn-ghost py-3 sm:py-2.5 text-sm">Send draft proposal</button>
+      <button class="btn-primary py-3 sm:py-2.5 text-sm">Open in Vantaca CRM</button>
     </div>
 
   </div>
