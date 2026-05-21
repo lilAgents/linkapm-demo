@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkAPM Intake System — Demo by lilAgents</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1f3d;
+    --navy-2: #18335c;
+    --gold: #b08a3c;
+    --gold-2: #d4af6e;
+    --bg: #f4f1ea;
+    --bg-2: #ebe7dd;
+    --paper: #ffffff;
+    --ink: #14181f;
+    --ink-2: #2a313d;
+    --muted: #6b7280;
+    --muted-2: #9aa1ab;
+    --line: #e2ded3;
+    --line-2: #efece5;
+    --success: #15803d;
+    --warn: #b45309;
+    --danger: #b91c1c;
+  }
+  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg-2); color: var(--ink); font-feature-settings: "ss01", "cv11"; }
+  .display { font-family: 'Fraunces', serif; letter-spacing: -0.02em; font-feature-settings: "ss01"; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Demo top bar */
+  .demo-bar {
+    background: #0a0a0a;
+    color: #fff;
+    border-bottom: 1px solid #1f1f1f;
+  }
+  .tab-btn { transition: all 0.15s ease; color: #8a8a8a; }
+  .tab-btn.active { background: #fff; color: #0a0a0a; }
+  .tab-btn:not(.active):hover { color: #fff; }
+
+  .stage { display: none; }
+  .stage.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Cards & forms */
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; }
+  .paper-shadow { box-shadow: 0 1px 2px rgba(10,31,61,0.04), 0 8px 24px -8px rgba(10,31,61,0.08); }
+
+  .step-dot { transition: all 0.25s; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .step-dot.active { background: var(--navy); color: #fff; }
+  .step-dot.complete { background: var(--navy); color: #fff; opacity: 0.4; }
+  .step-dot.future { background: #fff; color: var(--muted); border: 1px solid var(--line); }
+  .step-bar { background: var(--line); height: 1px; flex: 1; }
+  .step-bar.complete { background: var(--navy); opacity: 0.4; }
+
+  .form-step { display: none; }
+  .form-step.active { display: block; }
+
+  input, select, textarea {
+    transition: all 0.12s;
+    font-family: inherit;
+    background: #fff;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(10,31,61,0.08);
+  }
+  .input { border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; font-size: 14px; width: 100%; }
+
+  .radio-card, .check-card {
+    cursor: pointer;
+    transition: all 0.12s;
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+  .radio-card:hover, .check-card:hover {
+    border-color: var(--navy-2);
+  }
+  .radio-card.selected {
+    border-color: var(--navy);
+    background: #f8faff;
+    box-shadow: inset 0 0 0 1px var(--navy);
+  }
+  .check-card.selected {
+    border-color: var(--navy);
+    background: #f8faff;
+    box-shadow: inset 0 0 0 1px var(--navy);
+  }
+  .check-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 11px;
+    color: var(--navy);
+    font-weight: bold;
+  }
+  .check-card { position: relative; }
+
+  /* Primary button */
+  .btn-primary {
+    background: var(--navy);
+    color: #fff;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.12s;
+  }
+  .btn-primary:hover { background: var(--navy-2); }
+  .btn-ghost {
+    background: #fff;
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.12s;
+  }
+  .btn-ghost:hover { background: var(--bg); }
+
+  /* Tag/badge */
+  .tag-ai {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--navy); color: #fff;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 3px; font-weight: 600;
+  }
+  .tag-ai::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: var(--gold-2);
+    border-radius: 50%;
+  }
+  .tag-soft {
+    display: inline-flex; align-items: center;
+    background: var(--bg);
+    color: var(--ink-2);
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 3px; font-weight: 600;
+    border: 1px solid var(--line);
+  }
+
+  .pulse {
+    width: 7px; height: 7px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(34,197,94, 0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94, 0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(34,197,94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94, 0); }
+  }
+
+  /* Brief styling */
+  .brief-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .brief-divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--line) 0%, var(--line) 100%);
+  }
+  .stat-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+  .stat-value { font-family: 'Fraunces', serif; font-size: 22px; line-height: 1.1; letter-spacing: -0.02em; font-weight: 600; }
+
+  .note-box {
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .note-amber { background: #fefaed; border: 1px solid #f3e4b6; }
+  .note-red { background: #fef5f5; border: 1px solid #f3c8c8; }
+  .note-green { background: #f1faf1; border: 1px solid #c8e8d1; }
+  .note-navy { background: #f5f7fc; border: 1px solid #d8dff0; }
+
+  .point-num {
+    width: 22px; height: 22px;
+    background: var(--navy); color: #fff;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  details > summary { list-style: none; cursor: pointer; user-select: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] .chev { transform: rotate(90deg); }
+  .chev { transition: transform 0.15s; display: inline-block; }
+
+  .grain {
+    background-image:
+      radial-gradient(at 20% 30%, rgba(10,31,61,0.025) 0px, transparent 50%),
+      radial-gradient(at 80% 70%, rgba(176,138,60,0.025) 0px, transparent 50%);
+  }
+
+  .link-underline { border-bottom: 1px solid currentColor; }
+
+  .calendar-slot {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.12s;
+    background: #fff;
+  }
+  .calendar-slot:hover { border-color: var(--navy-2); }
+  .calendar-slot.selected {
+    border-color: var(--navy);
+    background: var(--navy);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px var(--navy);
+  }
+
+  /* Email preview */
+  .email-shell { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .email-head { background: #fafaf6; border-bottom: 1px solid var(--line); padding: 14px 20px; font-size: 12.5px; }
+  .email-body { padding: 24px; font-size: 14px; line-height: 1.65; color: var(--ink); }
+  .email-body p { margin-bottom: 14px; }
+  .email-body ul { margin-bottom: 14px; margin-left: 8px; }
+  .email-body li { margin-bottom: 4px; }
+
+  .avatar-mh {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px -4px rgba(10,31,61,0.3);
+  }
+
+  .meta-grid { display: grid; grid-template-columns: 140px 1fr; gap: 10px 20px; font-size: 13px; }
+  .meta-grid dt { color: var(--muted); font-weight: 500; }
+  .meta-grid dd { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- ============================ -->
+<!-- DEMO BAR -->
+<!-- ============================ -->
+<div class="demo-bar sticky top-0 z-50 px-5 py-2.5 flex items-center justify-between text-sm">
+  <div class="flex items-center gap-3">
+    <div class="pulse"></div>
+    <span class="mono text-xs tracking-wider uppercase">Demo</span>
+    <span class="text-gray-500 mono text-xs">·</span>
+    <span class="text-gray-400 text-xs">LinkAPM Intake System</span>
+  </div>
+  <div class="flex items-center gap-0.5 bg-white/5 p-0.5 rounded">
+    <button class="tab-btn active px-4 py-1.5 rounded text-[11px] font-semibold tracking-wide" data-stage="form">01 · INTAKE</button>
+    <button class="tab-btn px-4 py-1.5 rounded text-[11px] font-semibold tracking-wide" data-stage="confirm">02 · RESPONSE</button>
+    <button class="tab-btn px-4 py-1.5 rounded text-[11px] font-semibold tracking-wide" data-stage="brief">03 · BRIEF</button>
+  </div>
+  <div class="text-[11px] mono text-gray-500">lilAgents</div>
+</div>
+
+
+<!-- ============================ -->
+<!-- STAGE 01: INTAKE FORM -->
+<!-- ============================ -->
+<div class="stage active grain" id="stage-form" style="background: var(--bg);">
+
+  <header class="bg-white border-b" style="border-color: var(--line);">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded flex items-center justify-center" style="background: var(--navy);">
+          <span class="text-white font-bold text-sm display">L</span>
+        </div>
+        <div>
+          <div class="display font-bold text-base leading-none" style="color: var(--navy);">LinkAPM</div>
+          <div class="text-[9px] tracking-[0.15em] uppercase mt-0.5" style="color: var(--muted);">Association Management</div>
+        </div>
+      </div>
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium" style="color: var(--ink-2);">
+        <a>Services</a>
+        <a>Communities</a>
+        <a>Team</a>
+        <a>Resources</a>
+        <a class="px-4 py-1.5 rounded text-white text-sm font-semibold btn-primary">Board Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto px-6 py-14 grid md:grid-cols-12 gap-12">
+
+    <!-- Left: pitch -->
+    <div class="md:col-span-5">
+      <div class="mono text-[10px] tracking-[0.15em] uppercase mb-4" style="color: var(--gold);">
+        Request a proposal
+      </div>
+      <h1 class="display text-[44px] font-semibold leading-[1.05] mb-5" style="color: var(--navy);">
+        Built for boards that want <em>more</em> from their manager.
+      </h1>
+      <p class="text-base mb-8 leading-relaxed" style="color: var(--ink-2);">
+        Tell us about your community in 90 seconds. You'll hear back from our director within one business day, no generic sales pitch.
+      </p>
+
+      <div class="space-y-3.5 mb-8">
+        <div class="flex gap-3 items-start">
+          <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background: var(--navy);">
+            <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div class="text-sm" style="color: var(--ink-2);">
+            <strong style="color: var(--ink);">Real pricing in your proposal.</strong> No "schedule a call to learn pricing" games.
+          </div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background: var(--navy);">
+            <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div class="text-sm" style="color: var(--ink-2);">
+            <strong style="color: var(--ink);">Talk to a director, not a rep.</strong> You'll hear back from Jim Ambrosio directly.
+          </div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background: var(--navy);">
+            <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div class="text-sm" style="color: var(--ink-2);">
+            <strong style="color: var(--ink);">Capital-project ready.</strong> Plumbing, roofing, siding. We've done $40M+ of it.
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t pt-5" style="border-color: var(--line);">
+        <div class="mono text-[10px] tracking-[0.15em] uppercase mb-1.5" style="color: var(--muted);">Trusted by</div>
+        <div class="text-sm font-semibold" style="color: var(--navy);">200+ communities · Ohio · Indiana · Louisiana · Florida</div>
+      </div>
+    </div>
+
+    <!-- Right: form -->
+    <div class="md:col-span-7">
+      <div class="card paper-shadow p-7">
+
+        <!-- Progress -->
+        <div class="flex items-center justify-between mb-7">
+          <div class="flex items-center gap-1.5 flex-1">
+            <div class="step-dot active w-6 h-6 rounded-full flex items-center justify-center font-semibold" data-step="1">1</div>
+            <div class="step-bar"></div>
+            <div class="step-dot future w-6 h-6 rounded-full flex items-center justify-center font-semibold" data-step="2">2</div>
+            <div class="step-bar"></div>
+            <div class="step-dot future w-6 h-6 rounded-full flex items-center justify-center font-semibold" data-step="3">3</div>
+            <div class="step-bar"></div>
+            <div class="step-dot future w-6 h-6 rounded-full flex items-center justify-center font-semibold" data-step="4">4</div>
+          </div>
+          <div class="text-xs ml-4 mono" style="color: var(--muted);">
+            <span id="step-label">01 / 04</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Community -->
+        <div class="form-step active" data-step="1">
+          <h2 class="display text-2xl font-semibold mb-1.5" style="color: var(--navy);">Your community</h2>
+          <p class="text-sm mb-6" style="color: var(--muted);">Quick context so we can route this correctly.</p>
+
+          <div class="mb-5">
+            <label class="block text-xs font-semibold mb-2.5 tracking-wide uppercase" style="color: var(--muted);">Community type</label>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="radio-card rounded p-3.5" data-group="prop_type" data-value="condo">
+                <div class="font-semibold text-sm">Condominium Association</div>
+                <div class="text-xs mt-0.5" style="color: var(--muted);">Individual owners, shared common areas</div>
+              </div>
+              <div class="radio-card rounded p-3.5 selected" data-group="prop_type" data-value="hoa">
+                <div class="font-semibold text-sm">Homeowners Association</div>
+                <div class="text-xs mt-0.5" style="color: var(--muted);">Single-family or townhome community</div>
+              </div>
+              <div class="radio-card rounded p-3.5" data-group="prop_type" data-value="coop">
+                <div class="font-semibold text-sm">Housing Cooperative</div>
+                <div class="text-xs mt-0.5" style="color: var(--muted);">Co-op ownership structure</div>
+              </div>
+              <div class="radio-card rounded p-3.5" data-group="prop_type" data-value="mixed">
+                <div class="font-semibold text-sm">Mixed-use or Other</div>
+                <div class="text-xs mt-0.5" style="color: var(--muted);">Multiple property types</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mb-5">
+            <div>
+              <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Number of units</label>
+              <select class="input">
+                <option>Under 25</option>
+                <option>25 – 75</option>
+                <option selected>75 – 150</option>
+                <option>150 – 300</option>
+                <option>300+</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Community location</label>
+              <input type="text" value="Westerville, OH" class="input">
+            </div>
+          </div>
+
+          <div class="mb-7">
+            <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Community name</label>
+            <input type="text" value="Stoneridge Commons Condominium Association" class="input">
+          </div>
+
+          <button onclick="nextStep()" class="w-full py-3 btn-primary text-sm">
+            Continue
+          </button>
+        </div>
+
+        <!-- Step 2: Situation -->
+        <div class="form-step" data-step="2">
+          <h2 class="display text-2xl font-semibold mb-1.5" style="color: var(--navy);">Current situation</h2>
+          <p class="text-sm mb-6" style="color: var(--muted);">Helps us understand how we'd plug in.</p>
+
+          <div class="mb-5">
+            <label class="block text-xs font-semibold mb-2.5 tracking-wide uppercase" style="color: var(--muted);">How is your community managed today?</label>
+            <div class="space-y-2">
+              <div class="radio-card rounded p-3" data-group="situation" data-value="switching">
+                <div class="font-semibold text-sm">We have a management company but are looking to switch</div>
+              </div>
+              <div class="radio-card rounded p-3 selected" data-group="situation" data-value="self">
+                <div class="font-semibold text-sm">We're self-managed by the board</div>
+              </div>
+              <div class="radio-card rounded p-3" data-group="situation" data-value="new">
+                <div class="font-semibold text-sm">New construction, never had a manager</div>
+              </div>
+              <div class="radio-card rounded p-3" data-group="situation" data-value="exploring">
+                <div class="font-semibold text-sm">Just exploring options</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-7">
+            <label class="block text-xs font-semibold mb-2.5 tracking-wide uppercase" style="color: var(--muted);">What's driving this? <span class="font-normal normal-case tracking-normal" style="color: var(--muted-2);">(select all)</span></label>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="check-card rounded p-2.5 selected" data-value="capital">
+                <div class="text-xs font-semibold">Major capital project</div>
+              </div>
+              <div class="check-card rounded p-2.5" data-value="financial">
+                <div class="text-xs font-semibold">Financial reporting issues</div>
+              </div>
+              <div class="check-card rounded p-2.5 selected" data-value="burnout">
+                <div class="text-xs font-semibold">Board burnout</div>
+              </div>
+              <div class="check-card rounded p-2.5" data-value="vendors">
+                <div class="text-xs font-semibold">Vendor management</div>
+              </div>
+              <div class="check-card rounded p-2.5" data-value="collections">
+                <div class="text-xs font-semibold">Collections / delinquencies</div>
+              </div>
+              <div class="check-card rounded p-2.5" data-value="legal">
+                <div class="text-xs font-semibold">Legal or compliance concerns</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2.5">
+            <button onclick="prevStep()" class="flex-1 py-3 btn-ghost text-sm">Back</button>
+            <button onclick="nextStep()" class="flex-1 py-3 btn-primary text-sm">Continue</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Project -->
+        <div class="form-step" data-step="3">
+          <h2 class="display text-2xl font-semibold mb-1.5" style="color: var(--navy);">Project &amp; budget</h2>
+          <p class="text-sm mb-6" style="color: var(--muted);">If something big is on the horizon, we need to know.</p>
+
+          <div class="mb-5">
+            <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Major capital projects in the next 12 months</label>
+            <textarea rows="3" class="input" placeholder="Roof, plumbing, paving, etc.">Full roof and siding replacement across all 84 units. Bids are in, ranging $1.1M – $1.4M. Board needs help managing the project and the homeowner communication.</textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mb-5">
+            <div>
+              <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Annual operating budget</label>
+              <select class="input">
+                <option>Under $100K</option>
+                <option>$100K – $250K</option>
+                <option selected>$250K – $500K</option>
+                <option>$500K – $1M</option>
+                <option>$1M+</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Decision timeline</label>
+              <select class="input">
+                <option>Ready now</option>
+                <option selected>30 – 60 days</option>
+                <option>60 – 90 days</option>
+                <option>Just researching</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-7">
+            <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Anything else we should know?</label>
+            <textarea rows="3" class="input" placeholder="Optional">Our current treasurer is stepping down in March. We need someone who can do clean handoff documentation.</textarea>
+          </div>
+
+          <div class="flex gap-2.5">
+            <button onclick="prevStep()" class="flex-1 py-3 btn-ghost text-sm">Back</button>
+            <button onclick="nextStep()" class="flex-1 py-3 btn-primary text-sm">Continue</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Contact -->
+        <div class="form-step" data-step="4">
+          <h2 class="display text-2xl font-semibold mb-1.5" style="color: var(--navy);">How do we reach you?</h2>
+          <p class="text-sm mb-6" style="color: var(--muted);">Jim will follow up personally within one business day.</p>
+
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div>
+              <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">First name</label>
+              <input type="text" value="Margaret" class="input">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Last name</label>
+              <input type="text" value="Hollis" class="input">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Your role on the board</label>
+            <select class="input">
+              <option>President</option>
+              <option>Vice President</option>
+              <option selected>Treasurer</option>
+              <option>Secretary</option>
+              <option>Member at large</option>
+              <option>Not on the board</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Email</label>
+            <input type="email" value="m.hollis@stoneridgecommons.org" class="input">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 mb-7">
+            <div>
+              <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Phone</label>
+              <input type="tel" value="(614) 555-0184" class="input">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-2 tracking-wide uppercase" style="color: var(--muted);">Best time to call</label>
+              <select class="input">
+                <option>Mornings</option>
+                <option selected>Afternoons</option>
+                <option>Evenings</option>
+                <option>Anytime</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex gap-2.5">
+            <button onclick="prevStep()" class="flex-1 py-3 btn-ghost text-sm">Back</button>
+            <button onclick="submitForm()" class="flex-1 py-3 btn-primary text-sm" id="submit-btn">
+              <span id="submit-text">Send my inquiry</span>
+            </button>
+          </div>
+          <div class="text-[11px] mt-4 text-center" style="color: var(--muted);">
+            By submitting, you agree to be contacted by LinkAPM. We don't sell your data.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================ -->
+<!-- STAGE 02: INSTANT RESPONSE -->
+<!-- ============================ -->
+<div class="stage grain" id="stage-confirm" style="background: var(--bg);">
+  <header class="bg-white border-b" style="border-color: var(--line);">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded flex items-center justify-center" style="background: var(--navy);">
+          <span class="text-white font-bold text-sm display">L</span>
+        </div>
+        <div>
+          <div class="display font-bold text-base leading-none" style="color: var(--navy);">LinkAPM</div>
+          <div class="text-[9px] tracking-[0.15em] uppercase mt-0.5" style="color: var(--muted);">Association Management</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-4xl mx-auto px-6 py-14">
+
+    <!-- Confirmation -->
+    <div class="card paper-shadow p-9 mb-7">
+      <div class="flex items-start gap-4 mb-6">
+        <div class="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0" style="background: #dcfce7;">
+          <svg class="w-5 h-5" style="color: var(--success);" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div class="flex-1">
+          <div class="display text-3xl font-semibold mb-1" style="color: var(--navy);">Margaret, we got it.</div>
+          <div class="text-sm" style="color: var(--muted);">Inquiry received <span class="mono">14:47 EST</span> · Thu, May 21</div>
+        </div>
+      </div>
+
+      <div class="space-y-3 mb-8">
+        <div class="flex gap-3 items-start">
+          <div class="point-num">1</div>
+          <div class="text-sm pt-0.5">
+            <span class="font-semibold">Confirmation email sent.</span>
+            <span style="color: var(--muted);">Check m.hollis@stoneridgecommons.org for your responses and next steps.</span>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <div class="point-num">2</div>
+          <div class="text-sm pt-0.5">
+            <span class="font-semibold">Jim is being briefed on Stoneridge Commons.</span>
+            <span style="color: var(--muted);">Our system is pulling public records and context so he's prepared, not winging it.</span>
+          </div>
+        </div>
+        <div class="flex gap-3 items-start">
+          <div class="point-num">3</div>
+          <div class="text-sm pt-0.5">
+            <span class="font-semibold">Personal call within one business day.</span>
+            <span style="color: var(--muted);">Or book now if you'd rather skip the wait.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-md p-5 border" style="border-color: var(--line); background: #fafaf6;">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="font-semibold text-sm">Book Jim's calendar directly</div>
+            <div class="text-xs" style="color: var(--muted);">All times Eastern. 30-minute discovery call.</div>
+          </div>
+          <span class="tag-soft">3 slots open this week</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2 mb-4">
+          <div class="calendar-slot">
+            <div class="text-[10px] mono uppercase tracking-wider opacity-60">Tue</div>
+            <div class="text-sm font-semibold mt-0.5">May 26</div>
+            <div class="text-[11px] mt-0.5 opacity-70">2:00 PM</div>
+          </div>
+          <div class="calendar-slot selected">
+            <div class="text-[10px] mono uppercase tracking-wider opacity-80">Wed</div>
+            <div class="text-sm font-semibold mt-0.5">May 27</div>
+            <div class="text-[11px] mt-0.5 opacity-90">2:30 PM</div>
+          </div>
+          <div class="calendar-slot">
+            <div class="text-[10px] mono uppercase tracking-wider opacity-60">Thu</div>
+            <div class="text-sm font-semibold mt-0.5">May 28</div>
+            <div class="text-[11px] mt-0.5 opacity-70">3:00 PM</div>
+          </div>
+          <div class="calendar-slot">
+            <div class="text-[10px] mono uppercase tracking-wider opacity-60">Fri</div>
+            <div class="text-sm font-semibold mt-0.5">May 29</div>
+            <div class="text-[11px] mt-0.5 opacity-70">2:00 PM</div>
+          </div>
+        </div>
+        <button class="w-full py-2.5 btn-primary text-sm">
+          Confirm Wed, May 27 at 2:30 PM
+        </button>
+      </div>
+    </div>
+
+    <!-- Email preview -->
+    <div class="flex items-center gap-2 mb-3">
+      <span class="tag-ai">Sent · 4 sec after submit</span>
+      <span class="text-xs mono" style="color: var(--muted);">→ m.hollis@stoneridgecommons.org</span>
+    </div>
+    <div class="email-shell paper-shadow">
+      <div class="email-head">
+        <div class="grid grid-cols-[60px_1fr] gap-1.5">
+          <span style="color: var(--muted);">From</span>
+          <span><strong>Jim Ambrosio</strong> <span style="color: var(--muted);">&lt;jim@linkapm.com&gt;</span></span>
+          <span style="color: var(--muted);">To</span>
+          <span>Margaret Hollis &lt;m.hollis@stoneridgecommons.org&gt;</span>
+          <span style="color: var(--muted);">Subject</span>
+          <span><strong>Got your inquiry — confirming the details, Margaret</strong></span>
+        </div>
+      </div>
+      <div class="email-body">
+        <p>Margaret,</p>
+        <p>Thanks for reaching out about Stoneridge Commons. I'll be your direct point of contact.</p>
+        <p>Quick recap of what you shared so we're on the same page:</p>
+        <ul>
+          <li>· 84-unit condominium association in Westerville, OH</li>
+          <li>· Self-managed by the board today, exploring options</li>
+          <li>· Top priorities: board burnout and a $1.1M – $1.4M roof / siding project</li>
+          <li>· Decision timeline: 30 – 60 days</li>
+          <li>· Treasurer transitioning out in March, clean handoff documentation needed</li>
+        </ul>
+        <p>I've blocked <strong>Wed, May 27 at 2:30 PM</strong> on my calendar for our call. If that doesn't work, just reply with two or three windows that do.</p>
+        <p>Before we talk, here's a one-pager on how we've handled capital projects at similar communities: <span style="color: var(--navy);" class="link-underline">linkapm.com/stoneridge-brief</span></p>
+        <p>Talk soon,</p>
+        <p style="margin-bottom: 2px;">Jim Ambrosio</p>
+        <p class="text-xs" style="color: var(--muted); margin-bottom: 0;">Regional Director of Operations · LinkAPM<br>jim@linkapm.com · linkapm.com</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============================ -->
+<!-- STAGE 03: JIM'S BRIEF -->
+<!-- ============================ -->
+<div class="stage" id="stage-brief" style="background: var(--bg-2);">
+
+  <div class="max-w-4xl mx-auto px-6 py-10">
+
+    <!-- Meta strip -->
+    <div class="flex items-center justify-between mb-4 text-xs">
+      <div class="flex items-center gap-3">
+        <span class="tag-ai">Brief generated</span>
+        <span class="mono" style="color: var(--muted);">→ jim@linkapm.com · 14:51 EST · 4 min after inquiry</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="text-xs font-semibold flex items-center gap-1.5" style="color: var(--navy);">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Download PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- BRIEF DOCUMENT -->
+    <div class="card paper-shadow overflow-hidden">
+
+      <!-- Header -->
+      <div class="px-10 py-8" style="background: var(--navy); color: #fff;">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="brief-label" style="color: var(--gold-2);">Pre-call brief</div>
+            <div class="display text-[28px] font-semibold leading-tight mt-2">Stoneridge Commons COA</div>
+            <div class="text-sm mt-1.5" style="color: rgba(255,255,255,0.65);">Margaret Hollis · Treasurer · 84 units · Westerville, OH</div>
+          </div>
+          <div class="text-right">
+            <div class="brief-label" style="color: var(--gold-2);">Scheduled</div>
+            <div class="font-semibold mt-2 text-base">Wed, May 27</div>
+            <div class="text-sm mono" style="color: rgba(255,255,255,0.65);">2:30 PM EST</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-10 py-9">
+
+        <!-- 1. TL;DR -->
+        <section class="mb-9">
+          <div class="brief-label mb-3">The 30-second read</div>
+          <div class="note-box note-amber">
+            <p>
+              <strong>Hot lead.</strong> Self-managed 84-unit condo board in Westerville is burning out and sitting on a $1.1M – $1.4M roof and siding project they don't know how to run. Margaret is the Treasurer and she's stepping down in March, so she's personally motivated to lock in a manager before she hands off. Decision in 30 – 60 days. This is exactly the sweet spot.
+            </p>
+          </div>
+        </section>
+
+        <!-- 2. Signals -->
+        <section class="mb-9">
+          <div class="flex items-center justify-between mb-3">
+            <div class="brief-label">Lead signals</div>
+            <div class="brief-label">Auto-scored</div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="stat-card">
+              <div class="brief-label mb-1.5">Fit score</div>
+              <div class="stat-value" style="color: var(--success);">9.2 <span class="text-base" style="color: var(--muted);">/ 10</span></div>
+              <div class="text-[11px] mt-1" style="color: var(--muted);">Size · services · urgency aligned</div>
+            </div>
+            <div class="stat-card">
+              <div class="brief-label mb-1.5">Urgency</div>
+              <div class="stat-value" style="color: var(--warn);">High</div>
+              <div class="text-[11px] mt-1" style="color: var(--muted);">Capital project + treasurer exit</div>
+            </div>
+            <div class="stat-card">
+              <div class="brief-label mb-1.5">Est. ARR</div>
+              <div class="stat-value" style="color: var(--navy);">$38 – 52K</div>
+              <div class="text-[11px] mt-1" style="color: var(--muted);">84 units · standard pricing band</div>
+            </div>
+          </div>
+        </section>
+
+        <div class="brief-divider mb-9"></div>
+
+        <!-- 3. The community -->
+        <section class="mb-9">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="brief-label">The community</div>
+            <span class="tag-ai">Enriched</span>
+          </div>
+          <div class="text-sm leading-relaxed space-y-3" style="color: var(--ink-2);">
+            <p>
+              <strong>Stoneridge Commons Condominium Association.</strong> 84 units in Westerville, Franklin County. Incorporated 2003. Public records show the last special assessment was 2019 at $2,400 per unit for parking lot resurfacing.
+            </p>
+            <p>
+              Two-story brick and vinyl-sided buildings. <strong>Original roofs from 2003 are at end of life,</strong> which lines up with what Margaret submitted. Siding is also original.
+            </p>
+            <p>
+              Recent Google reviews (n=12) cluster around two themes: <span style="color: var(--warn); font-weight: 600;">"slow response to maintenance"</span> and <span style="color: var(--warn); font-weight: 600;">"unclear board communication."</span> Both are board-management problems we solve directly.
+            </p>
+            <p class="text-xs italic" style="color: var(--muted);">
+              Sources: Franklin County Auditor · OH Secretary of State · Google Business Profile · Zillow
+            </p>
+          </div>
+        </section>
+
+        <!-- 4. The person -->
+        <section class="mb-9">
+          <div class="flex items-center gap-2.5 mb-4">
+            <div class="brief-label">Who you're calling</div>
+            <span class="tag-ai">LinkedIn + Public</span>
+          </div>
+          <div class="flex gap-5">
+            <div class="avatar-mh">MH</div>
+            <div class="text-sm leading-relaxed space-y-2.5 flex-1" style="color: var(--ink-2);">
+              <p>
+                <strong>Margaret Hollis</strong> · Board Treasurer at Stoneridge Commons (3 yrs) · Day job: <strong>Senior Auditor at OhioHealth</strong> (14 yrs). She's a CPA.
+              </p>
+              <p>
+                She's going to ask detailed questions about reserve fund accounting, GAAP compliance, and audit trails. <strong>Don't dumb down the financial side.</strong> Lean into Vantaca's audit-ready reporting.
+              </p>
+              <p>
+                She's stepping off the board in March. Recent LinkedIn post (Mar 12): <em>"After three years of nights and weekends on board work, my family is ready to have me back."</em> She wants a clean exit. Frame us as the team that lets her hand off without guilt.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. Talking points -->
+        <section class="mb-9">
+          <div class="brief-label mb-3">Talking points · lead with these</div>
+          <div class="space-y-2.5">
+            <div class="note-box note-navy flex gap-3 items-start">
+              <div class="point-num">1</div>
+              <div class="flex-1">
+                <strong>Open with the project, not the pitch.</strong> "I saw you're sitting on a roof and siding decision. Walk me through where you are with the bids." Position us as the people who de-risk the project.
+              </div>
+            </div>
+            <div class="note-box note-navy flex gap-3 items-start">
+              <div class="point-num">2</div>
+              <div class="flex-1">
+                <strong>Surface the treasurer transition.</strong> "You mentioned a March handoff. What does a clean handoff look like to you?" Then walk through our onboarding-to-transition documentation flow.
+              </div>
+            </div>
+            <div class="note-box note-navy flex gap-3 items-start">
+              <div class="point-num">3</div>
+              <div class="flex-1">
+                <strong>Mention Westwood Crossing.</strong> Similar 76-unit condo, similar project ($890K siding job, 2023). Offer to connect her with their board president as a reference.
+              </div>
+            </div>
+            <div class="note-box note-navy flex gap-3 items-start">
+              <div class="point-num">4</div>
+              <div class="flex-1">
+                <strong>Show, don't tell, on reporting.</strong> She's a CPA. Have the Vantaca sample financial pack open and ready to screenshare.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. Watch outs -->
+        <section class="mb-9">
+          <div class="brief-label mb-3">Watch outs &amp; objections</div>
+          <div class="space-y-2.5">
+            <div class="note-box note-red">
+              <strong>Self-managed boards are price-sensitive.</strong> They're used to "free" management (their own time). Anchor on the cost of the capital project, not the monthly fee. A bad roof job costs more than five years of our fees.
+            </div>
+            <div class="note-box note-red">
+              <strong>She likely wants three quotes.</strong> Assume she's also talking to Towne Properties and Associa. Differentiate on capital-project experience early.
+            </div>
+            <div class="note-box note-green">
+              <strong>Good news.</strong> No current PM means no contract to break and no awkward transition. We can be live in 30 days.
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. Suggested close -->
+        <section class="mb-9">
+          <div class="brief-label mb-3">Suggested close</div>
+          <div class="border rounded p-5 italic text-sm leading-relaxed" style="border-color: var(--line); background: #fafaf6; color: var(--ink-2);">
+            "Before we wrap, here's what I'd propose: I send you a tailored proposal with two options — full management plus capital project oversight, and capital project oversight only. You and the board review it. We do a 30-minute follow-up next Wednesday with whoever else is on the decision committee. Sound good?"
+          </div>
+        </section>
+
+        <div class="brief-divider mb-6"></div>
+
+        <!-- Raw form data -->
+        <details>
+          <summary class="flex items-center justify-between py-2">
+            <div class="brief-label">Full form responses</div>
+            <div class="text-xs flex items-center gap-1.5" style="color: var(--muted);">
+              <span>Expand</span>
+              <span class="chev">›</span>
+            </div>
+          </summary>
+          <dl class="meta-grid mt-4 pt-4 border-t" style="border-color: var(--line); color: var(--ink-2);">
+            <dt>Community type</dt><dd>Condominium Association</dd>
+            <dt>Units</dt><dd>75 – 150</dd>
+            <dt>Location</dt><dd>Westerville, OH</dd>
+            <dt>Name</dt><dd>Stoneridge Commons Condominium Association</dd>
+            <dt>Current mgmt</dt><dd>Self-managed by the board</dd>
+            <dt>Drivers</dt><dd>Major capital project · Board burnout</dd>
+            <dt>Capital project</dt><dd>Full roof and siding replacement, 84 units. Bids $1.1M – $1.4M. Board needs help managing project and homeowner communication.</dd>
+            <dt>Annual budget</dt><dd>$250K – $500K</dd>
+            <dt>Decision timeline</dt><dd>30 – 60 days</dd>
+            <dt>Other notes</dt><dd>Treasurer stepping down in March. Wants clean handoff documentation.</dd>
+            <dt>Contact</dt><dd>Margaret Hollis · Treasurer · m.hollis@stoneridgecommons.org · (614) 555-0184 · Afternoons</dd>
+          </dl>
+        </details>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-10 py-4 border-t flex items-center justify-between text-[11px] mono" style="border-color: var(--line); background: #fafaf6; color: var(--muted);">
+        <div>LinkAPM Intake System · Built by lilAgents</div>
+        <div>Form · County records · LinkedIn · Google · Zillow · Vantaca</div>
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-5 grid grid-cols-3 gap-2.5">
+      <button class="btn-ghost py-2.5 text-sm">Mark reviewed</button>
+      <button class="btn-ghost py-2.5 text-sm">Send draft proposal</button>
+      <button class="btn-primary py-2.5 text-sm">Open in Vantaca CRM</button>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const stage = btn.dataset.stage;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+      document.getElementById('stage-' + stage).classList.add('active');
+      window.scrollTo(0, 0);
+    });
+  });
+
+  // Radio cards
+  document.querySelectorAll('.radio-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const group = card.dataset.group;
+      document.querySelectorAll(`.radio-card[data-group="${group}"]`).forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+
+  // Check cards
+  document.querySelectorAll('.check-card').forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.toggle('selected');
+    });
+  });
+
+  // Calendar slots
+  document.querySelectorAll('.calendar-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      document.querySelectorAll('.calendar-slot').forEach(s => s.classList.remove('selected'));
+      slot.classList.add('selected');
+    });
+  });
+
+  // Multi-step form
+  let currentStep = 1;
+  const totalSteps = 4;
+
+  function showStep(step) {
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+
+    document.querySelectorAll('.step-dot').forEach(dot => {
+      const dotStep = parseInt(dot.dataset.step);
+      dot.classList.remove('active', 'complete', 'future');
+      if (dotStep === step) dot.classList.add('active');
+      else if (dotStep < step) dot.classList.add('complete');
+      else dot.classList.add('future');
+    });
+
+    // Update bars
+    const bars = document.querySelectorAll('.step-bar');
+    bars.forEach((bar, idx) => {
+      bar.classList.toggle('complete', idx < step - 1);
+    });
+
+    document.getElementById('step-label').textContent =
+      String(step).padStart(2, '0') + ' / ' + String(totalSteps).padStart(2, '0');
+  }
+
+  function nextStep() {
+    if (currentStep < totalSteps) { currentStep++; showStep(currentStep); }
+  }
+  function prevStep() {
+    if (currentStep > 1) { currentStep--; showStep(currentStep); }
+  }
+
+  function submitForm() {
+    const btn = document.getElementById('submit-btn');
+    const txt = document.getElementById('submit-text');
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    txt.textContent = 'Submitting...';
+
+    setTimeout(() => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.tab-btn[data-stage="confirm"]').classList.add('active');
+      document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+      document.getElementById('stage-confirm').classList.add('active');
+      window.scrollTo(0, 0);
+
+      // Reset for next demo run
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      txt.textContent = 'Send my inquiry';
+    }, 700);
+  }
+</script>
+
+</body>
+</html>
