@@ -1,0 +1,7 @@
+# Local Netlify folder
+.netlify
+
+# Local handoff doc — internal notes only, not for the public repo
+HANDOFF.md
+
+.DS_Store
